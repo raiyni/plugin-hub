@@ -1,0 +1,35 @@
+plugins {
+	id "com.github.johnrengelman.shadow" version "6.1.0"
+}
+
+allprojects {
+	version "2.0-SNAPSHOT"
+	group "net.runelite.pluginhub"
+
+	tasks.withType(AbstractArchiveTask) {
+		preserveFileTimestamps = false
+		reproducibleFileOrder = true
+	}
+}
+
+subprojects {
+	apply plugin: "java"
+	apply plugin: "com.github.johnrengelman.shadow"
+
+	sourceCompatibility = 1.8
+
+	shadowJar {
+		archiveFileName.set archiveBaseName.get() + "." + archiveExtension.get()
+	}
+}
+
+// we have this task then java -jar the output rather than using gradle run so
+// the daemon used to build this can be reused by a real plugin build
+task prep {
+	dependsOn ":package:shadowJar"
+	dependsOn ":initLib:shadowJar"
+	doLast {
+		file("build").mkdirs()
+		file("build/gradleHome").write(gradle.gradleHomeDir.absolutePath)
+	}
+}

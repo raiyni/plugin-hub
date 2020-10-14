@@ -23,23 +23,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[[ "${TRAVIS_PULL_REQUEST:-false}" == "false" ]] || exit 0
+set -e -x
 
-SECONDS=0
-
-for PLUGIN in plugins/* ; do 
-	if [ $SECONDS -gt 60 ]; then
-		echo "travis_fold:start:intermediate_manifest"
-		./build_manifest.sh
-		SECONDS=0
-		echo "travis_fold:end:intermediate_manifest"
-	fi
-	PLUGIN_ID=$(basename "$PLUGIN")
-	echo "travis_fold:start:$PLUGIN_ID"
-	./build_plugin.sh "$PLUGIN" || echo "Build failed for $PLUGIN_ID"
-	echo "travis_fold:end:$PLUGIN_ID"
-done
-
-echo "travis_fold:start:final_manifest"
-./build_manifest.sh
-echo "travis_fold:end:final_manifest"
+: ' 
+env:
+  -FORCE_BUILD: example-external-plugin
+'
+pushd "$(dirname "$0")"
+./gradlew --build-cache prep
+popd
+java -XX:+UseParallelGC -jar package/package/build/libs/package.jar
