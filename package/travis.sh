@@ -32,4 +32,7 @@ env:
 pushd "$(dirname "$0")"
 ./gradlew --build-cache prep
 popd
-java -XX:+UseParallelGC -jar package/package/build/libs/package.jar
+
+PACKAGE_IS_PR="$TRAVIS_PULL_REQUEST" \
+PACKAGE_COMMIT_RANGE="TRAVIS_COMMIT_RANGE" \
+  java -XX:+UseParallelGC -jar package/package/build/libs/package.jar

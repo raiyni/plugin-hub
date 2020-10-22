@@ -58,7 +58,7 @@ public class UploadConfiguration
 
 	public UploadConfiguration fromEnvironment(String runeliteVersion)
 	{
-		String prNo = System.getenv("TRAVIS_PULL_REQUEST");
+		String prNo = System.getenv("PACKAGE_IS_PR");
 		if (prNo != null && !prNo.isEmpty() && !"false".equalsIgnoreCase(prNo))
 		{
 			return this;
